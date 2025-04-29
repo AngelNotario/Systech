@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS `cajas` (
   CONSTRAINT `FK_caja_usuarios` FOREIGN KEY (`usuario`) REFERENCES `usuarios` (`usuario_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla systech.cajas: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla systech.cajas: ~1 rows (aproximadamente)
 INSERT INTO `cajas` (`id_caja`, `estatus`, `hora_apertura`, `hora_cierre`, `usuario`, `efectivo_inicial`, `efectivo_final`) VALUES
 	(2, 'abierta', '2025-04-29 07:47:16', NULL, 1, 100.00, 100.00);
 
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS `categorias` (
   PRIMARY KEY (`categoria_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla systech.categorias: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla systech.categorias: ~1 rows (aproximadamente)
 INSERT INTO `categorias` (`categoria_id`, `nombre`, `descripcion`) VALUES
 	(3, 'Proteinas', 'Suplemento alimenticio con alta concentración de proteína');
 
@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla systech.clientes: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla systech.clientes: ~2 rows (aproximadamente)
 INSERT INTO `clientes` (`cliente_id`, `nombre`, `apellidos`, `telefono`, `email`, `fecha_registro`, `estado`) VALUES
 	(1, 'Juan', 'Perez', '987654321', 'juan@example.com', '2025-04-29 07:32:20', 'Activo'),
 	(2, 'Angel', 'Notario', '9161297488', 'asd@gmail.com', '2025-04-29 08:16:04', 'Activo');
@@ -96,9 +96,10 @@ CREATE TABLE IF NOT EXISTS `membresias` (
   CONSTRAINT `membresias_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`cliente_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Volcando datos para la tabla systech.membresias: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla systech.membresias: ~2 rows (aproximadamente)
 INSERT INTO `membresias` (`membresia_id`, `cliente_id`, `tipo_membresia`, `fecha_inicio`, `fecha_fin`, `estado`, `costo`) VALUES
-	(1, 1, 'Mensual', '2023-10-01', '2023-11-01', 'Activa', 350.00);
+	(1, 1, 'Mensual', '2023-10-01', '2023-11-01', 'Activa', 350.00),
+	(2, 2, 'Anual', '2024-04-29', '2026-04-29', 'Activa', 450.00);
 
 -- Volcando estructura para tabla systech.pagos
 CREATE TABLE IF NOT EXISTS `pagos` (
@@ -135,9 +136,10 @@ CREATE TABLE IF NOT EXISTS `productos` (
   CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`categoria_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla systech.productos: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla systech.productos: ~1 rows (aproximadamente)
 INSERT INTO `productos` (`producto_id`, `nombre`, `descripcion`, `categoria_id`, `precio_compra`, `precio_venta`, `stock`, `codigo_barras`, `fecha_creacion`, `imagen`) VALUES
-	(3, 'Proteina', 'Whey proteina 20g por scoop', 3, 800.00, 1200.00, 5, '123456', '2025-04-29', '6810dfee9cbfe-pngwing.com.png');
+	(3, 'Proteina', 'Gold Standard 100% Whey Proteína de suero de leche Optimum Nutrition Chocolate 2 Libras', 3, 800.00, 1200.00, 5, '123456', '2025-04-29', '6810dfee9cbfe-pngwing.com.png'),
+	(4, 'Dymatize Elite 100% Whey 5 Lbs Sabor Gourmet Vainilla', 'Elite 100% Whey Proteína de suero de leche Dymatize Vainilla 5 Libras\r\nSuplemento Alimenticio\r\nSabor Vainilla\r\n5 Libras\r\nEste producto no es un medicamento, y es responsabilidad de quien lo recomienda y de quien lo usa.', 3, 800.00, 1500.00, 3, '456123', '2025-04-29', '6810f50e10f01-71--ibg8NjL.__AC_SX300_SY300_QL70_ML2_.jpg');
 
 -- Volcando estructura para tabla systech.roles
 CREATE TABLE IF NOT EXISTS `roles` (
@@ -148,7 +150,7 @@ CREATE TABLE IF NOT EXISTS `roles` (
   UNIQUE KEY `nombre_rol` (`nombre_rol`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla systech.roles: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla systech.roles: ~2 rows (aproximadamente)
 INSERT INTO `roles` (`rol_id`, `nombre_rol`, `descripcion`) VALUES
 	(1, 'Administrador', 'Administrador'),
 	(2, 'Vendedor', 'Vendedor');
@@ -163,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `rolesusuarios` (
   CONSTRAINT `rolesusuarios_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`rol_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla systech.rolesusuarios: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla systech.rolesusuarios: ~2 rows (aproximadamente)
 INSERT INTO `rolesusuarios` (`usuario_id`, `rol_id`) VALUES
 	(1, 1),
 	(2, 2);
@@ -196,7 +198,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   UNIQUE KEY `correo` (`correo`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla systech.usuarios: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla systech.usuarios: ~2 rows (aproximadamente)
 INSERT INTO `usuarios` (`usuario_id`, `nombre_usuario`, `contrasena_hash`, `correo`, `nombre_completo`, `estado`, `fecha_registro`) VALUES
 	(1, 'Admin', '$2y$10$LwLvchksSIotnhRcALXWO.FkgI8C6yhvasbOdG5dJ.rFMBR72Y54q', 'asdas@gmail.com', 'Tenshi Admin', 'activo', '2025-04-07 23:55:19'),
 	(2, 'tenshi', '$2y$10$qZ8OHE5NCYpIGNwDY1o6ne6NdWIVq8HIn4pOKwX6Z45yms3P5EQ32', 'angelmini640@gmail.com', 'Angel Notario Posadas', 'activo', '2025-04-26 20:06:32');

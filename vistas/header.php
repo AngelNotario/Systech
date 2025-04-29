@@ -22,7 +22,7 @@ $rol = $_SESSION['roles'];
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Accesorios Brenda</title>
+    <title>Pilots Gym</title>
 
     <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
     <link href="../assets/icons/font/bootstrap-icons.css" rel="stylesheet">

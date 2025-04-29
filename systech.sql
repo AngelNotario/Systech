@@ -1,166 +1,208 @@
--- Crear la base de datos
-CREATE DATABASE IF NOT EXISTS systech;
-USE systech;
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Versión del servidor:         9.2.0 - MySQL Community Server - GPL
+-- SO del servidor:              Win64
+-- HeidiSQL Versión:             12.8.0.6908
+-- --------------------------------------------------------
 
--- Tabla Roles
-CREATE TABLE IF NOT EXISTS Roles (
-    rol_id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_rol VARCHAR(50) NOT NULL UNIQUE
-);
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Tabla Usuarios
-CREATE TABLE IF NOT EXISTS Usuarios (
-    usuario_id INT AUTO_INCREMENT PRIMARY KEY,
-    rol_id INT NOT NULL,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    email VARCHAR(100) NOT NULL UNIQUE,
-    fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo',
-    FOREIGN KEY (rol_id) REFERENCES Roles(rol_id)
-);
 
--- Tabla Sucursal
-CREATE TABLE IF NOT EXISTS Sucursal (
-    sucursal_id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    direccion VARCHAR(255) NOT NULL,
-    telefono VARCHAR(15),
-    email VARCHAR(100)
-);
+-- Volcando estructura de base de datos para systech
+CREATE DATABASE IF NOT EXISTS `systech` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `systech`;
 
--- Tabla Almacén
-CREATE TABLE IF NOT EXISTS Almacen (
-    almacen_id INT AUTO_INCREMENT PRIMARY KEY,
-    sucursal_id INT NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    FOREIGN KEY (sucursal_id) REFERENCES Sucursal(sucursal_id)
-);
+-- Volcando estructura para tabla systech.almacen
+CREATE TABLE IF NOT EXISTS `almacen` (
+  `almacen_id` int NOT NULL AUTO_INCREMENT,
+  `sucursal_id` int NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` text,
+  PRIMARY KEY (`almacen_id`),
+  KEY `sucursal_id` (`sucursal_id`),
+  CONSTRAINT `almacen_ibfk_1` FOREIGN KEY (`sucursal_id`) REFERENCES `sucursal` (`sucursal_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Tabla Categorías para Productos
-CREATE TABLE IF NOT EXISTS Categorias (
-    categoria_id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL UNIQUE,
-    descripcion TEXT
-);
+-- Volcando datos para la tabla systech.almacen: ~1 rows (aproximadamente)
+INSERT INTO `almacen` (`almacen_id`, `sucursal_id`, `nombre`, `descripcion`) VALUES
+	(1, 1, 'Almacén Principal', 'Almacén de la sucursal central');
 
--- Tabla Productos
-CREATE TABLE IF NOT EXISTS Productos (
-    producto_id INT AUTO_INCREMENT PRIMARY KEY,
-    categoria_id INT NOT NULL,
-    almacen_id INT NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    precio DECIMAL(10, 2) NOT NULL,
-    stock INT NOT NULL,
-    FOREIGN KEY (categoria_id) REFERENCES Categorias(categoria_id),
-    FOREIGN KEY (almacen_id) REFERENCES Almacen(almacen_id)
-);
+-- Volcando estructura para tabla systech.cajas
+CREATE TABLE IF NOT EXISTS `cajas` (
+  `id_caja` int NOT NULL AUTO_INCREMENT,
+  `estatus` enum('abierta','cerrada') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `hora_apertura` datetime DEFAULT NULL,
+  `hora_cierre` datetime DEFAULT NULL,
+  `usuario` int NOT NULL,
+  `efectivo_inicial` decimal(60,2) NOT NULL,
+  `efectivo_final` decimal(60,2) DEFAULT NULL,
+  PRIMARY KEY (`id_caja`),
+  KEY `FK_caja_usuarios` (`usuario`),
+  CONSTRAINT `FK_caja_usuarios` FOREIGN KEY (`usuario`) REFERENCES `usuarios` (`usuario_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabla Clientes
-CREATE TABLE IF NOT EXISTS Clientes (
-    cliente_id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    apellido VARCHAR(100) NOT NULL,
-    telefono VARCHAR(15),
-    email VARCHAR(100) UNIQUE,
-    fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP,
-    estado ENUM('Activo', 'Inactivo') DEFAULT 'Activo'
-);
+-- Volcando datos para la tabla systech.cajas: ~0 rows (aproximadamente)
+INSERT INTO `cajas` (`id_caja`, `estatus`, `hora_apertura`, `hora_cierre`, `usuario`, `efectivo_inicial`, `efectivo_final`) VALUES
+	(2, 'abierta', '2025-04-29 07:47:16', NULL, 1, 100.00, 100.00);
 
--- Tabla Membresías
-CREATE TABLE IF NOT EXISTS Membresias (
-    membresia_id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente_id INT NOT NULL,
-    tipo_membresia ENUM('Mensual', 'Trimestral', 'Anual') NOT NULL,
-    fecha_inicio DATE NOT NULL,
-    fecha_fin DATE NOT NULL,
-    estado ENUM('Activa', 'Inactiva') DEFAULT 'Activa',
-    costo DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES Clientes(cliente_id)
-);
+-- Volcando estructura para tabla systech.categorias
+CREATE TABLE IF NOT EXISTS `categorias` (
+  `categoria_id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  PRIMARY KEY (`categoria_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Tabla Pagos
-CREATE TABLE IF NOT EXISTS Pagos (
-    pago_id INT AUTO_INCREMENT PRIMARY KEY,
-    membresia_id INT NOT NULL,
-    fecha_pago DATETIME DEFAULT CURRENT_TIMESTAMP,
-    monto DECIMAL(10, 2) NOT NULL,
-    metodo_pago ENUM('Efectivo', 'Tarjeta', 'Transferencia') NOT NULL,
-    estado ENUM('Completado', 'Pendiente') DEFAULT 'Completado',
-    FOREIGN KEY (membresia_id) REFERENCES Membresias(membresia_id)
-);
+-- Volcando datos para la tabla systech.categorias: ~0 rows (aproximadamente)
+INSERT INTO `categorias` (`categoria_id`, `nombre`, `descripcion`) VALUES
+	(3, 'Proteinas', 'Suplemento alimenticio con alta concentración de proteína');
 
--- Tabla Ventas
-CREATE TABLE IF NOT EXISTS Ventas (
-    venta_id INT AUTO_INCREMENT PRIMARY KEY,
-    cliente_id INT NOT NULL,
-    usuario_id INT NOT NULL, -- Llave foránea de Usuario
-    fecha_venta DATETIME DEFAULT CURRENT_TIMESTAMP,
-    total DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (cliente_id) REFERENCES Clientes(cliente_id),
-    FOREIGN KEY (usuario_id) REFERENCES Usuarios(usuario_id)
-);
+-- Volcando estructura para tabla systech.clientes
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `cliente_id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `apellidos` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `telefono` varchar(15) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `fecha_registro` datetime DEFAULT CURRENT_TIMESTAMP,
+  `estado` enum('Activo','Inactivo') DEFAULT 'Activo',
+  PRIMARY KEY (`cliente_id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Tabla Detalle_Ventas
-CREATE TABLE IF NOT EXISTS Detalle_Ventas (
-    detalle_venta_id INT AUTO_INCREMENT PRIMARY KEY,
-    venta_id INT NOT NULL,
-    producto_id INT NOT NULL,
-    cantidad INT NOT NULL,
-    precio_unitario DECIMAL(10, 2) NOT NULL,
-    subtotal DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (venta_id) REFERENCES Ventas(venta_id),
-    FOREIGN KEY (producto_id) REFERENCES Productos(producto_id)
-);
+-- Volcando datos para la tabla systech.clientes: ~1 rows (aproximadamente)
+INSERT INTO `clientes` (`cliente_id`, `nombre`, `apellidos`, `telefono`, `email`, `fecha_registro`, `estado`) VALUES
+	(1, 'Juan', 'Perez', '987654321', 'juan@example.com', '2025-04-29 07:32:20', 'Activo'),
+	(2, 'Angel', 'Notario', '9161297488', 'asd@gmail.com', '2025-04-29 08:16:04', 'Activo');
 
--- Tabla Mobiliario
-CREATE TABLE IF NOT EXISTS Mobiliario (
-    mobiliario_id INT AUTO_INCREMENT PRIMARY KEY,
-    sucursal_id INT NOT NULL,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    cantidad INT NOT NULL,
-    estado ENUM('Disponible', 'En Uso', 'Mantenimiento', 'Dañado') DEFAULT 'Disponible',
-    FOREIGN KEY (sucursal_id) REFERENCES Sucursal(sucursal_id)
-);
+-- Volcando estructura para tabla systech.membresias
+CREATE TABLE IF NOT EXISTS `membresias` (
+  `membresia_id` int NOT NULL AUTO_INCREMENT,
+  `cliente_id` int NOT NULL,
+  `tipo_membresia` enum('Mensual','Trimestral','Anual') NOT NULL,
+  `fecha_inicio` date NOT NULL,
+  `fecha_fin` date NOT NULL,
+  `estado` enum('Activa','Inactiva') DEFAULT 'Activa',
+  `costo` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`membresia_id`),
+  KEY `cliente_id` (`cliente_id`),
+  CONSTRAINT `membresias_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`cliente_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Insertar roles iniciales
-INSERT INTO Roles (nombre_rol) VALUES ('Administrador'), ('Recepcionista'), ('Entrenador');
+-- Volcando datos para la tabla systech.membresias: ~1 rows (aproximadamente)
+INSERT INTO `membresias` (`membresia_id`, `cliente_id`, `tipo_membresia`, `fecha_inicio`, `fecha_fin`, `estado`, `costo`) VALUES
+	(1, 1, 'Mensual', '2023-10-01', '2023-11-01', 'Activa', 350.00);
 
--- Insertar un usuario administrador inicial (password: admin123)
-INSERT INTO Usuarios (rol_id, username, password, email)
-VALUES (1, 'admin', SHA2('admin123', 256), 'admin@gym.com');
+-- Volcando estructura para tabla systech.pagos
+CREATE TABLE IF NOT EXISTS `pagos` (
+  `pago_id` int NOT NULL AUTO_INCREMENT,
+  `membresia_id` int NOT NULL,
+  `fecha_pago` datetime DEFAULT CURRENT_TIMESTAMP,
+  `monto` decimal(10,2) NOT NULL,
+  `metodo_pago` enum('Efectivo','Tarjeta','Transferencia') NOT NULL,
+  `estado` enum('Completado','Pendiente') DEFAULT 'Completado',
+  PRIMARY KEY (`pago_id`),
+  KEY `membresia_id` (`membresia_id`),
+  CONSTRAINT `pagos_ibfk_1` FOREIGN KEY (`membresia_id`) REFERENCES `membresias` (`membresia_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Insertar una sucursal inicial
-INSERT INTO Sucursal (nombre, direccion, telefono, email)
-VALUES ('Sucursal Central', 'Calle Principal 123', '123456789', 'central@gym.com');
+-- Volcando datos para la tabla systech.pagos: ~1 rows (aproximadamente)
+INSERT INTO `pagos` (`pago_id`, `membresia_id`, `fecha_pago`, `monto`, `metodo_pago`, `estado`) VALUES
+	(1, 1, '2025-04-29 07:32:20', 50.00, 'Efectivo', 'Completado');
 
--- Insertar un almacén inicial
-INSERT INTO Almacen (sucursal_id, nombre, descripcion)
-VALUES (1, 'Almacén Principal', 'Almacén de la sucursal central');
+-- Volcando estructura para tabla systech.productos
+CREATE TABLE IF NOT EXISTS `productos` (
+  `producto_id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `categoria_id` int DEFAULT NULL,
+  `precio_compra` decimal(10,2) NOT NULL,
+  `precio_venta` decimal(10,2) NOT NULL,
+  `stock` int NOT NULL DEFAULT '0',
+  `codigo_barras` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `fecha_creacion` date NOT NULL,
+  `imagen` varchar(150) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  PRIMARY KEY (`producto_id`),
+  UNIQUE KEY `codigo_barras` (`codigo_barras`),
+  KEY `idx_productos_categoria` (`categoria_id`),
+  CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`categoria_id`) REFERENCES `categorias` (`categoria_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insertar una categoría inicial
-INSERT INTO Categorias (nombre, descripcion)
-VALUES ('Suplementos', 'Productos nutricionales y suplementos deportivos');
+-- Volcando datos para la tabla systech.productos: ~0 rows (aproximadamente)
+INSERT INTO `productos` (`producto_id`, `nombre`, `descripcion`, `categoria_id`, `precio_compra`, `precio_venta`, `stock`, `codigo_barras`, `fecha_creacion`, `imagen`) VALUES
+	(3, 'Proteina', 'Whey proteina 20g por scoop', 3, 800.00, 1200.00, 5, '123456', '2025-04-29', '6810dfee9cbfe-pngwing.com.png');
 
--- Insertar un producto inicial
-INSERT INTO Productos (categoria_id, almacen_id, nombre, descripcion, precio, stock)
-VALUES (1, 1, 'Proteína en Polvo', 'Proteína de suero de leche', 25.99, 100);
+-- Volcando estructura para tabla systech.roles
+CREATE TABLE IF NOT EXISTS `roles` (
+  `rol_id` int NOT NULL AUTO_INCREMENT,
+  `nombre_rol` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
+  PRIMARY KEY (`rol_id`),
+  UNIQUE KEY `nombre_rol` (`nombre_rol`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insertar un cliente inicial
-INSERT INTO Clientes (nombre, apellido, telefono, email)
-VALUES ('Juan', 'Perez', '987654321', 'juan@example.com');
+-- Volcando datos para la tabla systech.roles: ~0 rows (aproximadamente)
+INSERT INTO `roles` (`rol_id`, `nombre_rol`, `descripcion`) VALUES
+	(1, 'Administrador', 'Administrador'),
+	(2, 'Vendedor', 'Vendedor');
 
--- Insertar una membresía inicial
-INSERT INTO Membresias (cliente_id, tipo_membresia, fecha_inicio, fecha_fin, costo)
-VALUES (1, 'Mensual', '2023-10-01', '2023-11-01', 50.00);
+-- Volcando estructura para tabla systech.rolesusuarios
+CREATE TABLE IF NOT EXISTS `rolesusuarios` (
+  `usuario_id` int NOT NULL,
+  `rol_id` int NOT NULL,
+  PRIMARY KEY (`usuario_id`,`rol_id`),
+  KEY `rol_id` (`rol_id`),
+  CONSTRAINT `rolesusuarios_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`usuario_id`),
+  CONSTRAINT `rolesusuarios_ibfk_2` FOREIGN KEY (`rol_id`) REFERENCES `roles` (`rol_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Insertar un pago inicial
-INSERT INTO Pagos (membresia_id, monto, metodo_pago)
-VALUES (1, 50.00, 'Efectivo');
+-- Volcando datos para la tabla systech.rolesusuarios: ~0 rows (aproximadamente)
+INSERT INTO `rolesusuarios` (`usuario_id`, `rol_id`) VALUES
+	(1, 1),
+	(2, 2);
 
--- Insertar un mobiliario inicial
-INSERT INTO Mobiliario (sucursal_id, nombre, descripcion, cantidad)
-VALUES (1, 'Máquina de Pesas', 'Máquina para ejercicios de fuerza', 10);
+-- Volcando estructura para tabla systech.sucursal
+CREATE TABLE IF NOT EXISTS `sucursal` (
+  `sucursal_id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `direccion` varchar(255) NOT NULL,
+  `telefono` varchar(15) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`sucursal_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Volcando datos para la tabla systech.sucursal: ~1 rows (aproximadamente)
+INSERT INTO `sucursal` (`sucursal_id`, `nombre`, `direccion`, `telefono`, `email`) VALUES
+	(1, 'Sucursal Central', 'Calle Principal 123', '123456789', 'central@gym.com');
+
+-- Volcando estructura para tabla systech.usuarios
+CREATE TABLE IF NOT EXISTS `usuarios` (
+  `usuario_id` int NOT NULL AUTO_INCREMENT,
+  `nombre_usuario` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `contrasena_hash` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `correo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `nombre_completo` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `estado` enum('activo','inactivo') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'activo',
+  `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`usuario_id`),
+  UNIQUE KEY `nombre_usuario` (`nombre_usuario`),
+  UNIQUE KEY `correo` (`correo`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla systech.usuarios: ~0 rows (aproximadamente)
+INSERT INTO `usuarios` (`usuario_id`, `nombre_usuario`, `contrasena_hash`, `correo`, `nombre_completo`, `estado`, `fecha_registro`) VALUES
+	(1, 'Admin', '$2y$10$LwLvchksSIotnhRcALXWO.FkgI8C6yhvasbOdG5dJ.rFMBR72Y54q', 'asdas@gmail.com', 'Tenshi Admin', 'activo', '2025-04-07 23:55:19'),
+	(2, 'tenshi', '$2y$10$qZ8OHE5NCYpIGNwDY1o6ne6NdWIVq8HIn4pOKwX6Z45yms3P5EQ32', 'angelmini640@gmail.com', 'Angel Notario Posadas', 'activo', '2025-04-26 20:06:32');
+
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
